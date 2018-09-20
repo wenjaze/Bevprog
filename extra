@@ -17,20 +17,4 @@ int main()
 	a = a - b;
 
 	cout << a << " " << b << endl;
-	
-	//2. Mutassuk meg, hogy milyen hosszú a gépünkön egy gépi szó.
-
-	int i = 1;
-	int sz = 0;
-	while (i != 0){
-			
-			i <<= 1;
-			sz++;
-			cout << i << endl;
-			
-	}
-
-	cout << sz << " lepes utan lesz 0." << endl;
-
-	return 0;
-}
+}	
