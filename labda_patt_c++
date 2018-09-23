@@ -1,0 +1,71 @@
+#include<unistd.h>
+#include"std_lib_facilities.h"
+
+
+//Az IF-nek a működésben nincs szerepe, csak a sebesség megállapításához kell.
+string seb(int s){	
+	string a = " ";
+	if(s < 10000)	{a = "Fenysebesseg";}
+	else if(s >= 10000 && s < 20000) {a = "Nagyon gyors";}
+	else if(s >= 20000 && s < 50000) {a = "Normál";}
+	else if(s >= 50000) {a = "Lassú";}
+	return a;
+}
+//"Mozgás kiszámítása"
+int move(int x, int y){
+	for(int i=0; i<y; i++)
+	{
+	cout<<endl;
+	}	
+	for(int i=0; i<x; i++) 
+	cout<<" ";
+}
+
+int main(){
+
+	int stx=1, sty=1,x=10,y=10,speed = 0,ert_scy=30,ert_scx=110;
+	int scaley[ert_scy], scalex[ert_scx];	
+	string labda = "X";
+	string se = "x";
+	cout<<"Pálya magassága : ";	
+	cin>>ert_scy;
+	cout<<"Pálya hossza : ";
+	cin>>ert_scx;		
+	for(int i=1; i<ert_scy; i++)
+	{	
+	scaley[i]=1;
+	scaley[1]=-1;	
+	scaley[ert_scy-1]=-1;
+	}	
+	for(int i=1; i<ert_scx; i++)
+	{
+	scalex[i]=1;
+	scalex[1]=-1;
+	scalex[ert_scx-1]=-1;
+	}	
+	cout<<"Sebesség érték : ";
+	cin>>speed;
+	cout<<"Mi legyen a labda : ";
+	cin>>labda;
+	se = seb(speed);
+	//Sebesség megadása, x és y koordináta értéke.	
+	
+	while(true) //végtelen ciklus
+	{	
+	cout<<"Sebesség : "<<se;	
+	cout<<" | x : "<<x;
+	cout<<" | y : "<<y<<endl;
+	for(int i = 0;i < ert_scx;i++)
+	{
+	cout<<"-";
+	}	
+	move(x,y);
+	cout<<labda<<endl; //"labda"
+	x+=stx; y+=sty;
+	stx*=scalex[x]; 
+	sty*=scaley[y];
+	usleep(speed); //Gyorsaság
+	system("clear");
+	}
+	return 0;
+}
