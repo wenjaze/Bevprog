@@ -1,0 +1,70 @@
+#include <iostream>
+#include "std_lib_facilities.h"
+
+using namespace std;
+
+int main(){
+
+	/*
+//Konverter----------------
+	//EZEKET AZ ERTEKEKET MINDIG AT KELL IRNI :)
+  double huf_usd = 274.25;
+	double huf_eur = 323.42;
+	double eur_usd = 1.174;
+	double ertek = 1;
+	char valuta1 = 'a';
+	char valuta2 = 'a';	
+	cout<<"Adjon meg egy értéket, majd a kezdo valutat,";
+	cout<<"majd a veg valutat : \nd - dollar\nf - forint\ne - euro"<<endl;
+	cout<<"Ertek : ";cin>>ertek;
+	cout<<"1. valuta : ";cin>>valuta1;
+	cout<<"2. valuta : ";cin>>valuta2;
+	if (valuta1 == 'f')
+	switch(valuta2)
+		{
+	case'd':
+		cout << ertek << " HUF = "<<ertek/huf_usd<<" USD"<<endl;
+		break;
+	case'e':
+		cout << ertek << " HUF = "<<ertek/huf_eur<<" EUR"<<endl;
+		break;
+		}
+	
+	else if (valuta1 == 'e')
+	switch(valuta2)
+		{
+	case'd':
+		cout << ertek << " EUR = "<<ertek/eur_usd<<" USD"<<endl;
+		break;
+	case'f':
+		cout << ertek << " EUR = "<<ertek*huf_eur<<" HUF"<<endl;
+		break;		
+		}
+	
+	else if (valuta1 == 'd')
+	switch(valuta2)
+		{
+	case'f':
+		cout << ertek << " USD = "<<ertek*huf_usd<<" HUF"<<endl;
+		break;
+	case'e':
+		cout << ertek << " USD = "<<ertek/eur_usd<<" EUR"<<endl;
+		break;
+		}
+//Konverter--------------
+	*/
+	
+	/*
+//Karakter + ASCII kódja while ciklussal
+	int i = 97;
+	while(i != int('z'+1))	{
+		cout<<char(i)<<"\t"<<i<<endl;
+		i++;
+	}
+	*/	
+	
+//Karakter + ASCII kódja for ciklussal
+	for(int i = 48;i<int('z'+1);i++)
+	cout<<char(i)<<"\t"<<i<<endl;
+	return 0;
+}
