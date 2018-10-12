@@ -1,0 +1,28 @@
+#include <iostream>
+
+int square(int a){	
+	return a*a;
+}
+int pow(int x,int y){
+	for(int i = 1;i<y;i++)	
+	return x = x*x;
+}
+
+int main(){
+
+	int i = 0;
+	/*
+	while(i < 100){
+		std::cout<<i<<'\t'<<square(i)<<std::endl;
+		++i;
+	}
+	*/
+	
+
+	for(i;i<100;++i){
+		std::cout<<i<<'\t'<<square(i)<<std::endl;
+	}
+
+	
+	return 0;
+}
