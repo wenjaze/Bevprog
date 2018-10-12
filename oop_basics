@@ -1,0 +1,35 @@
+#include <iostream>
+#include <string>
+
+class Termek{
+	public:	
+	double cikk;
+	double ar;
+	std::string nev;
+	int meret;
+	public:
+	void set(double c,double a,std::string n,int m)
+	{
+		cikk = c;
+		ar = a;
+		nev = n;
+		meret = m;
+	}
+	void draw()
+	{
+		std::cout<<"Termekleiras : "<<std::endl;
+		std::cout<<"- Termek neve : "<<nev<<std::endl;		
+		std::cout<<"- Termek cikkszama : "<<cikk<<std::endl;
+		std::cout<<"- Termek ara : "<<ar<<"Ft.-"<<std::endl;
+		std::cout<<"- Termek merete : "<<meret<<std::endl;
+		
+	}
+};
+
+int main(){
+	int mer = 0;
+	Termek t1;	
+	t1.set(201113,19990,"Nike Tiempo cipő",45);
+	t1.draw();
+	return 0;
+}
