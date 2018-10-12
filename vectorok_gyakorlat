@@ -1,0 +1,65 @@
+/*
+
+az elso fuggveny hasznalataval nem szukseges az std_lib_facilities.h header!!!
+
+*/
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include "std_lib_facilities.h"
+
+using namespace std;
+
+/*void sort(vector<string> v)
+{
+	return sort(v.begin(),v.end());
+}
+*/
+
+int main(){
+
+	
+	/*
+	vector<double> temps;
+	double temp=0;
+	while(cin>>temp){
+	 temps.push_back(temp);
+	}
+	double sum=0;
+	for (int i = 0;i< temps.size();i++)
+	{
+		sum += temps[i];
+	}
+	cout<<"Mean temperature : "<<sum/temps.size()<<endl;
+
+	sort(temps);
+	cout<<"Median temperature : "<<temps[temps.size()/2]<<endl;
+	*/
+	vector<string> words;
+	for(string s;cin>>s && s != "quit";)
+	{
+		words.push_back(s);
+	}
+	sort(words);
+	vector<string> w2;
+	if (0<words.size()){
+	w2.push_back(words[0]);
+	for (int i = 1;i<words.size();i++){
+	if(words[i-1]!=words[i])
+			w2.push_back(words[i]);
+	
+	}
+	cout<<"found"<<words.size()-w2.size()<< "duplicates\n";
+	}	
+	for (string s : w2)
+	cout<<s<<"\n";
+	
+
+
+
+
+
+
+	return 0;
+}
