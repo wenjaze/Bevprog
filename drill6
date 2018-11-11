@@ -1,0 +1,108 @@
+//DRILL5
+//HIBAKEZELÉS
+
+#include "std_lib_facilities.h"
+
+int main()
+{
+	int f_szam = 0;
+	try {
+	// ------ 1.
+	std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  std::cout << "Success!\n";
+	// ------ 2.
+	std::cout<<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  std::cout<<"Success!\n;
+	// ------ 3.
+	std::cout <<++f_szam<<". Success" << "!\n"; // ------ Eredeti programrész :  std::cout << "Success" << !\n"
+	// ------ 4.
+	std::cout <<++f_szam<<". Success!" << '\n'; // ------ Eredeti programrész :  std::cout << success << '\n';
+	// ------ 5.
+	int res = 7;
+	vector<int> v(10); v[5] = res;
+	std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  string res = 7;
+	// ------ 6.
+	vector<int> v1(10);
+	v1[5] = 7;
+	if (v1[5]==7) std::cout <<++f_szam<<". Success!\n";  // ------ Eredeti programrész :  vector<int> v1(10); v1(5) = 7; if (v1(5)!=7) std::cout << "Success!\n";
+	// ------ 7.
+	bool cond = true;
+	if (cond) std::cout <<++f_szam<<". Success!\n";
+	else std::cout << "Fail!\n"; // ------ Eredeti programrész :  if (cond) std::cout << "Success!\n"; else std::cout << "Fail!\n";
+	// ------ 8.
+	bool c = false;
+	if (!c) std::cout <<++f_szam<<". Success!\n";
+	else std::cout << "Fail!\n"; // ------ Eredeti programrész :  bool c = false; if (c) std::cout << "Success!\n"; else std::cout << "Fail!\n";
+	// ------ 9.
+	string s = "ape";
+	bool c1 = "fool"<s;
+	if (!c1) std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  string s = "ape"; boo c1 = "fool"<s; if (c1) std::cout << "Success!\n";
+	// ------ 10.
+	string s1 = "ape";
+	if (s1!="fool") std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  string s1 = "ape"; if (s1=="fool") std::cout <<++f_szam<<". Success!\n";
+	// ------ 11.
+	string s2 = "ape";
+	if (s2!="fool") std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : string s2 = "ape"; if (s2=="fool") std::cout < "Success!\n";
+	// ------ 12.
+	string s3 = "ape";
+	if (s3<"fool") std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  string s3 = "ape"; if (s3+"fool") std::cout < "Success!\n";
+	// ------ 13.
+	vector<char> v2(5);
+	for (int i=0; i<v2.size(); ++i);
+	std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  vector<char> v2(5); for (int i=0; 0<v2.size(); ++i); std::cout <<++f_szam<<".Success!\n";
+	// ------ 14.
+	vector<char> v3(5);
+	for (int i=0; i<v3.size(); ++i);
+	std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész :  vector<char> v3(5); for (int i=0; i<=v3.size(); ++i) ; std::cout <<++f_szam<<". Success!\n";
+	// ------ 15.
+	std::cout<<++f_szam<<". ";
+	string s4 = "Success!\n";
+	for (int i=0; i<s4.length(); ++i) std::cout << s4[i]; // ------ Eredeti programrész : string s4 = "Success!\n"; for (int i=0; i<6; ++i) std::cout << s4[i];
+	// ------ 16.
+	if (true) std::cout <<++f_szam<<". Success!\n";
+	else std::cout << "Fail!\n"; // ------ Eredeti programrész : if (true) then std::cout <<++f_szam<<". Success!\n"; else std::cout << "Fail!\n";
+	// ------ 17.
+	int x = 2000;
+	char c2 = x;
+	if (c2 != 2000) std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : int x = 2000; char c2 = x; if (c2 == 2000) std::cout <<++f_szam<<". Success!\n";
+	// ------ 18.
+	std::cout<<++f_szam<<". ";
+	string s5 = "Success!\n";
+	for (int i=0; i<s5.length(); ++i) std::cout << s5[i]; // ------ Nincs hiba.
+	// ------ 19.
+	vector <string> v4(5);
+	for (int i=0; i<=v.size(); ++i);
+	std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : vector v4(5); for (int i=0; i<=v.size(); ++i) ; std::cout << "Success!\n";
+	// ------ 20.
+	int i1=0;
+	int j = 9;
+	while (i1 != 10) ++i1;
+	if (j<i1) std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : int i1=0; int j = 9; while (i<10) ++j; if (j<i) std::cout << "Success!\n";
+	// ------ 21.
+	int x1 = 2;
+	double d = 5/double(x1);
+	if (d==2+0.5) std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : int x1 = 2; double d = 5/(x1-2); if (d==2*x1+0.5) std::cout << "Success!\n";
+	// ------ 22.
+	std::cout<<++f_szam<<". ";
+	string s6 = "Success!\n";
+	for (int i=0; i<=10; ++i) std::cout << s6[i]; // ------ Eredeti programrész : string <char> s6 = "Success!\n"; for (int i=0; i<=10; ++i) std::cout << s[i];
+	// ------ 23.
+	int i2=0;
+	int j2 = 9; 
+	while (i2<10) ++i2;
+	if (j2<i2) std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : int i2=0; while (i<10) ++j2; if (j2<i) std::cout << "Success!\n";
+	// ------ 24.
+	int x2 = 4;
+	double d2 = 5 / double(x2 - 2);
+	if (d2 == 2 + 0.5) std::cout <<++f_szam<<". Success!\n"; // ------ Eredeti programrész : int x2 = 4; double d = 5/(x2–2); if (d=2*x2+0.5) std::cout << "Success!\n";
+	// ------ 25.
+	std::cout <<++f_szam<<". Success!\n"; 
+
+	keep_window_open();
+	
+	return 0;
+	}
+	catch (exception& kiv) {
+		cerr << "error: " << kiv.what() << '\n';
+		keep_window_open();
+		return -1;
+	}
+}
