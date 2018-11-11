@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-
+#include <vector>
 
 double
 atlagos_szohossz (const char *titkos, int titkos_meret)
@@ -15,13 +15,16 @@ atlagos_szohossz (const char *titkos, int titkos_meret)
   for (int i = 0; i < titkos_meret; ++i)
     if (titkos[i] == ' ')
       ++sz;
-  
+
   return (double) titkos_meret / sz;
 }
 
 int
 tiszta_lehet (const char *titkos, int titkos_meret)
 {
+  // a tiszta szoveg valszeg tartalmazza a gyakori magyar szavakat
+  // illetve az átlagos szóhossz vizsgálatával csökkentjük a
+  // potenciális töréseket
 
   double szohossz = atlagos_szohossz (titkos, titkos_meret);
 
@@ -58,7 +61,7 @@ exor_tores (const char kulcs[], int kulcs_meret, char titkos[],
 
 }
 
-char
+int
 main (void)
 {
 
@@ -66,35 +69,41 @@ main (void)
   char titkos[MAX_TITKOS];
   char *p = titkos;
   int olvasott_bajtok;
+  std::vector <char> kod = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
+  // titkos fajt berantasa
   while ((olvasott_bajtok =
 	  read (0, (void *) p,
 		(p - titkos + OLVASAS_BUFFER <
 		 MAX_TITKOS) ? OLVASAS_BUFFER : titkos + MAX_TITKOS - p)))
     p += olvasott_bajtok;
- 
+
+  // maradek hely nullazasa a titkos bufferben  
   for (int i = 0; i < MAX_TITKOS - (p - titkos); ++i)
     titkos[p - titkos + i] = '\0';
 
-  for (char ii = 'a'; ii <= 'z'; ++ii)
-    for (char ji = 'a'; ji <= 'z'; ++ji)
-      for (char ki = 'a'; ki <= 'z'; ++ki)
-	for (char li = 'a'; li <= 'z'; ++li)
-	  for (char mi = 'a'; mi <= 'z'; ++mi)
-	   
+  // osszes kulcs eloallitasa
+  for (int ii = 0; ii <= kod.size(); ++ii)
+    for (int ji = 0; ji <= kod.size(); ++ji)
+      for (int ki = 0; ki <= kod.size(); ++ki)
+	for (int li = 0; li <= kod.size(); ++li)
+	  for (int mi = 0; mi <= kod.size(); ++mi)
 		  {
-		    kulcs[0] = ii;
-		    kulcs[1] = ji;
-		    kulcs[2] = ki;
-		    kulcs[3] = li;
-		    kulcs[4] = mi;
-		  
-			
+		    kulcs[0] = kod[ii];
+		    kulcs[1] = kod[ji];
+		    kulcs[2] = kod[ki];
+		    kulcs[3] = kod[li];
+		    kulcs[4] = kod[mi];
+
 		    if (exor_tores (kulcs, KULCS_MERET, titkos, p - titkos))
+			{
 		      printf
 			("Kulcs: [%c%c%c%c%c]\nTiszta szoveg: [%s]\n",
-			 ii, ji, ki, li, mi, titkos);
- 
+			 kod[ii], kod[ji], kod[ki], kod[li], kod[mi], titkos);
+				return 0;
+			}
+
+		    // ujra EXOR-ozunk, igy nem kell egy masodik buffer  
 		    exor (kulcs, KULCS_MERET, titkos, p - titkos);
 		  }
 
