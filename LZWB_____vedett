@@ -63,71 +63,95 @@
 #include <iostream>		// mert olvassuk a std::cin, írjuk a std::cout csatornákat
 #include <cmath>		// mert vonunk gyököt a szóráshoz: std::sqrt
 #include <fstream>		// fájlból olvasunk, írunk majd
-#include <string>
+#include <string>		
+
+
 /* Az LZWBinFa osztályban absztraháljuk az LZW algoritmus bináris fa építését. Az osztály
  definíciójába beágyazzuk a fa egy csomópontjának az absztrakt jellemzését, ez lesz a
  beágyazott Csomopont osztály. Miért ágyazzuk be? Mert külön nem szánunk neki szerepet, ezzel
  is jelezzük, hogy csak a fa részeként számiolunk vele.*/
 
+
+/* 
+
+
+
+ÍGY HASZNÁLD : ./programneveamireforditottuk bemeneti_fajl_neve.txt -o kimeneti_fajl_neve.txt -i vagy -po vagy -pr (-s a statisztikáért).
+
+
+*/
+
+
+
 class LZWBinFa
 {
 public:
     
-    LZWBinFa ():fa (&gyoker) // Konstruktor - A fát ráállítja a gyökérre.
+    
+
+    LZWBinFa ():fa (&gyoker) // --- Konstruktor, annyit csinál, hogy amikor meghívódik, a fa gyökerére áll.
     {
     }
-    ~LZWBinFa () // Destruktor - Meghívásakor felszabadítja az egyes,0s gyermeket.
+    ~LZWBinFa () // --- Destruktor, amikor meghívódik, felszabadítja az adott csomopont 0-s és 1-es gyermekeit.
     {
         szabadit (gyoker.egyesGyermek ());
         szabadit (gyoker.nullasGyermek ());
     }
 
-    /* Tagfüggvényként túlterheljük a << operátort, ezzel a célunk, hogy felkeltsük a
-     hallgató érdeklődését, mert ekkor így nyomhatjuk a fába az inputot: binFa << b; ahol a b
-     egy '0' vagy '1'-es betű.
-     Mivel tagfüggvény, így van rá "értelmezve" az aktuális (this "rejtett paraméterként"
-     kapott ) példány, azaz annak a fának amibe éppen be akarjuk nyomni a b betűt a tagjai
-     (pl.: "fa", "gyoker") használhatóak a függvényben.
 
-     A függvénybe programoztuk az LZW fa építésének algoritmusát tk.:
-     http://progpater.blog.hu/2011/02/19/gyonyor_a_tomor
+    /* ------------------------
+    Getter fügvények, itt arra szolgálnak, hogy visszaadják a binfába bekerülő (nulla,egy) és binfába nem bekerülő nullák és egyek (ossznulla,osszegy) számát.
+    összegy,össznulla azért kell, hogy a végén statisztikát tudjunk vezetni, hány 0-t és 1-et vizsgáltunk és azokból hány került be a fába.(5ösért volt előző gyakon.)
+    -------------------------- */
 
-     a b formális param az a betű, amit éppen be kell nyomni a fába.
-     
-     a binFa << b (ahol a b majd a végén látszik, hogy már az '1' vagy a '0') azt jelenti
-     tagfüggvényként, hogy binFa.operator<<(b) (globálisként így festene: operator<<(binFa, b) )
-    
-     */
-    
-    int getNulla() // Getter függvény a nullák összeszámolására.
+    double
+    getNull()
     {
-        return nulla;
-    }
-    int getEgy() // Getter függvény az egyek összeszámolására.
-    {
-        return egy;
+    	return nulla;
     }
 
+    double
+    getOsszNull()
+    {
+    	return ossznulla;
+    }
+
+
+    double
+    getEgy()
+    {
+    	return egy;
+    }
+
+    double
+    getOsszEgy()
+    {
+    	return osszegy;
+    }
+
+
+    // --- Tagfüggvényként túlterheljük az << operatort, így binFa << b vel nyomhatjuk az adott 0-t vagy 1-et a fába.
 
     void operator<< (char b)
     {
-
         // Mit kell betenni éppen, '0'-t?
         if (b == '0')
         {
-            
+        	// --- A vizsgált bit 0, tehát az ossznulla-t noveljuk.
+        	++ossznulla;
             /* Van '0'-s gyermeke az aktuális csomópontnak?
            megkérdezzük Tőle, a "fa" mutató éppen reá mutat */
             if (!fa->nullasGyermek ())	// ha nincs, hát akkor csinálunk
             {
+
                 // elkészítjük, azaz páldányosítunk a '0' betű akt. parammal
                 Csomopont *uj = new Csomopont ('0');
                 // az aktuális csomópontnak, ahol állunk azt üzenjük, hogy
                 // jegyezze már be magának, hogy nullás gyereke mostantól van
                 // küldjük is Neki a gyerek címét:
                 fa->ujNullasGyermek (uj);
-                nulla++; // itt teszi be a fába a 0-t, ha betette növeljük 1-el a "nulla" értékét.
-                // (később ezt kérdezzük majd le a Getter függvényünkkel.)
+                // --- Itt egy új 0-t rakunk a fába tehát a nullák számát 1-et növeljük az összeszámoláshoz.
+                nulla++;
                 // és visszaállunk a gyökérre (mert ezt diktálja az alg.)
                 fa = &gyoker;
             }
@@ -140,12 +164,14 @@ public:
         // Mit kell betenni éppen, vagy '1'-et?
         else
         {
-            
+        	// --- else, tehát a vizsgált bit nem 0, osszegyet növeljük 1-el.
+        	++osszegy;
             if (!fa->egyesGyermek ())
             {
                 Csomopont *uj = new Csomopont ('1');
                 fa->ujEgyesGyermek (uj);
-                egy++; // ugyanaz mint a nulla++;
+                // --- Új 1-es kerül a fába növeljük az egyesek számát.
+                egy++;
                 fa = &gyoker;
             }
             else
@@ -153,68 +179,35 @@ public:
                 fa = fa->egyesGyermek ();
             }
         }
-        // return nulla,egy;
     }
-    /* A bejárással kapcsolatos függvényeink (túlterhelt kiir-ók, atlag, ratlag stb.) rekurzívak,
-     tk. a rekurzív fabejárást valósítják meg (lásd a 3. előadás "Fabejárás" c. fóliáját és társait)
 
-     (Ha a rekurzív függvénnyel általában gondod van => K&R könyv megfelelő része: a 3. ea. izometrikus
-     részében ezt "letáncoltuk" :) és külön idéztük a K&R álláspontját :)
-   */
-    void kiiri (void) // inodrder bejaras --
+    void kiiri (void)
     {
-        
-        // ha nem mondta meg a hívó az üzenetben, hogy hova írjuk ki a fát, akkor a
-        // sztenderd out-ra nyomjuk
+        melyseg = 0;
         kiiri (&gyoker, std::cout);
     }
-    void kiirpo (void) // postorder bejaras --
+    void kiirpr (void)
     {
-        melyseg = 0;
-        kiirpo (&gyoker,std::cout);
+    	melyseg = 0;
+    	kiiri (&gyoker, std::cout);
     }
-    void kiirpr (void) // preorder bejaras --
+    void kiirpo (void)
     {
-        melyseg = 0;
-        kiirpr (&gyoker,std::cout);
+    	melyseg = 0;
+    	kiiri (&gyoker, std::cout);
     }
-    /* már nem használjuk, tartalmát a dtor hívja
-  void szabadit (void)
-  {
-    szabadit (gyoker.egyesGyermek ());
-    szabadit (gyoker.nullasGyermek ());
-    // magát a gyökeret nem szabadítjuk, hiszen azt nem mi foglaltuk a szabad tárban (halmon).
-  }
-  */
-
-    /* A változatosság kedvéért ezeket az osztálydefiníció (class LZWBinFa {...};) után definiáljuk,
-     hogy kénytelen légy az LZWBinFa és a :: hatókör operátorral minősítve definiálni :) l. lentebb */
+ 
     int getMelyseg (void);
     double getAtlag (void);
     double getSzoras (void);
+    int egy = 0;
+    int nulla = 0;
+    int osszegy = 0;
+    int ossznulla = 0;
 
 
-    /* Vágyunk, hogy a felépített LZW fát ki tudjuk nyomni ilyenformán: std::cout << binFa;
-     de mivel a << operátor is a sztenderd névtérben van, de a using namespace std-t elvből
-     nem használjuk bevezető kurzusban, így ez a konstrukció csak az argfüggő névfeloldás miatt
-     fordul le (B&L könyv 185. o. teteje) ám itt nem az a lényeg, hanem, hogy a cout ostream
-     osztálybeli, így abban az osztályban kéne módosítani, hogy tudjon kiírni LZWBinFa osztálybelieket...
-     e helyett a globális << operátort terheljük túl,
-     
-     a kiFile << binFa azt jelenti, hogy
-     
-      - tagfüggvényként: kiFile.operator<<(binFa) de ehhez a kiFile valamilyen
-      std::ostream stream osztály forrásába kellene beleírni ezt a tagfüggvényt,
-      amely ismeri a mi LZW binfánkat...
-      
-      - globális függvényként: operator<<(kiFile, binFa) és pont ez látszik a következő sorban:
 
-     */
-    friend std::ostream & operator<< (std::ostream & os, LZWBinFa & bf)
-    {
-        bf.kiiri (os);
-        return os;
-    }
+    // --- Nem a legszebb megoldás de működik, 3 külön fv-t írunk és a "-i | -po | -pr"-től függően máshogy "járjuk" be a fát
     void kiiri (std::ostream & os)
     {
         melyseg = 0;
@@ -293,81 +286,74 @@ private:
     Csomopont *fa;
     // technikai
     int melyseg, atlagosszeg, atlagdb;
-    int nulla = 0;
-    int egy = 0;
     double szorasosszeg;
     // szokásosan: nocopyable
     LZWBinFa (const LZWBinFa &);
     LZWBinFa & operator= (const LZWBinFa &);
 
     /* Kiírja a csomópontot az os csatornára. A rekurzió kapcsán lásd a korábbi K&R-es utalást... */
-    void kiiri (Csomopont * elem, std::ostream & os) //Inorder bejárás bal gyermek,gyökér,jobb gyermek.
+    void kiiri (Csomopont * elem, std::ostream & os) //INORDER
     {
         // Nem létező csomóponttal nem foglalkozunk... azaz ez a rekurzió leállítása
         if (elem != NULL)
         {
             ++melyseg;
-            kiiri (elem->nullasGyermek (), os); //bal
+            kiiri (elem->nullasGyermek (), os);//bal
             
-            // ez a postorder bejáráshoz képest
-            // 1-el nagyobb mélység, ezért -1
             for (int i = 0; i < melyseg; ++i)
                 os << "-";
-            os << elem->getBetu () << "(" << melyseg << ")" << std::endl;//root
-            kiiri (elem->egyesGyermek (), os); //jobb
+            os << elem->getBetu () << "(" << melyseg << ")" << std::endl;//gyoker
+            kiiri (elem->egyesGyermek (), os);//jobb
             --melyseg;
         }
     }
 
-    void kiirpo (Csomopont * elem, std::ostream & os) //Postorder bejárás bal gyermek,jobb gyermek,gyökér gyermek.
+    void kiirpo (Csomopont * elem, std::ostream & os) //POSTORDER
     {
         // Nem létező csomóponttal nem foglalkozunk... azaz ez a rekurzió leállítása
         if (elem != NULL)
         {
             ++melyseg;
-            kiirpo (elem->nullasGyermek (), os);
-            kiirpo (elem->egyesGyermek (), os);
+            kiirpo (elem->nullasGyermek (), os); //bal
+            kiirpo (elem->egyesGyermek (), os); //jobb
             for (int i = 0; i < melyseg; ++i)
                 os << "-";
-            os << elem->getBetu () << "(" << melyseg << ")" << std::endl;
+            os << elem->getBetu () << "(" << melyseg << ")" << std::endl; //gyoker
             
             --melyseg;
         }
     }
-    
-    void kiirpr (Csomopont * elem, std::ostream & os) // Preorder bejárás gyökér,jobb gy,bal gy.
+
+    void kiirpr (Csomopont * elem, std::ostream & os) //PREORDER
     {
         // Nem létező csomóponttal nem foglalkozunk... azaz ez a rekurzió leállítása
         if (elem != NULL)
         {
             ++melyseg;
-            for (int i = 0; i < melyseg; ++i)
-                os << "---";
-            os << elem->getBetu () << "(" << melyseg << ")" << std::endl;
-            kiirpr (elem->nullasGyermek (), os);
-            kiirpr (elem->egyesGyermek (), os);
             
+
+            for (int i = 0; i < melyseg; ++i)
+                os << "-";
+            os << elem->getBetu () << "(" << melyseg << ")" << std::endl; //gyoker
+
+            kiirpr (elem->nullasGyermek (), os); //bal
+            kiirpr (elem->egyesGyermek (), os); //jobb
             --melyseg;
         }
     }
+
     void szabadit (Csomopont * elem)
     {
-        // Nem létező csomóponttal nem foglalkozunk... azaz ez a rekurzió leállítása
         if (elem != NULL)
         {
             szabadit (elem->egyesGyermek ());
             szabadit (elem->nullasGyermek ());
-            // ha a csomópont mindkét gyermekét felszabadítottuk
-            // azután szabadítjuk magát a csomópontot:
             delete elem;
         }
     }
 
-protected:			// ha esetleg egyszer majd kiterjesztjük az osztályt, mert
-    // akarunk benne valami újdonságot csinálni, vagy meglévő tevékenységet máshogy... stb.
-    // akkor ezek látszanak majd a gyerek osztályban is
+protected:	
 
-    /* A fában tagként benne van egy csomópont, ez erősen ki van tüntetve, Ő a gyökér: */
     Csomopont gyoker;
     int maxMelyseg;
     double atlag, szoras;
@@ -375,19 +361,8 @@ protected:			// ha esetleg egyszer majd kiterjesztjük az osztályt, mert
     void rmelyseg (Csomopont * elem);
     void ratlag (Csomopont * elem);
     void rszoras (Csomopont * elem);
-    void rnulla (Csomopont * elem);
 
 };
-
-// Néhány függvényt az osztálydefiníció után definiálunk, hogy lássunk ilyet is ... :)
-// Nem erőltetjük viszont a külön fájlba szedést, mert a sablonosztályosított tovább
-// fejlesztésben az linkelési gondot okozna, de ez a téma már kivezet a laborteljesítés
-// szükséges feladatából: http://progpater.blog.hu/2011/04/12/imadni_fogjak_a_c_t_egy_emberkent_tiszta_szivbol_3
-
-// Egyébként a melyseg, atlag és szoras fgv.-ek a kiir fgv.-el teljesen egy kaptafa.
-
-
-
 
 
 int
@@ -424,7 +399,6 @@ LZWBinFa::getSzoras (void)
     return szoras;
 }
 
-
 void
 LZWBinFa::rmelyseg (Csomopont * elem)
 {
@@ -434,8 +408,6 @@ LZWBinFa::rmelyseg (Csomopont * elem)
         if (melyseg > maxMelyseg)
             maxMelyseg = melyseg;
         rmelyseg (elem->egyesGyermek ());
-        // ez a postorder bejáráshoz képest
-        // 1-el nagyobb mélység, ezért -1
         rmelyseg (elem->nullasGyermek ());
         --melyseg;
     }
@@ -477,78 +449,101 @@ LZWBinFa::rszoras (Csomopont * elem)
 
 
 void
-usage (void)
+err_msg (void)
 {
-    std::cout << "Usage: lzwtree in_file -o out_file" << std::endl;
+    std::cout << "Usage : ./z input.txt -o output.txt -i | -po | -pr (optional: -s for statistics)" << std::endl;
 }
 
+// --- Függvény hibakezelésre, majd a mainbe paraméterként az argc-t írjuk.
+// --- argc az egy sima int változó, "int main (int argc,char *argv[])". A paraccsorba beírt paraméterek számát adja vissza. pl : "./z3a7 bemenet.txt -o kimenet.txt -i -s" ez 6 paraméter.
+int
+err_arg_num (int num)
+{
+	try {
+    	if (num < 5 || num > 7) throw &num; // vagy írunk -s-t vagy nem szóval mint a 2 féle képpen működnie kell.
+	
+	}
+	catch (int *num) {
+		err_msg();
+		if (*num > 6)
+		std::cout<<"Error : Too much arguments ("<<*num<<")."<<std::endl;
 
+		if (*num < 5)
+		std::cout<<"Error : Not enough arguments ("<<*num<<")."<<std::endl;
+		
+
+		return -1;
+	}
+}
+
+// --- Függvény a százalékhoz.(double betett lesz majd a nulla,egy.double ossz lesz majd ossznulla,osszegy)
+double
+stat(double betett,double ossz)
+{
+	return (betett/ossz)*100;
+}
 
 int
 main (int argc, char *argv[])
 {
-    int egy = 0;
-    int nulla = 0;
-    // http://progpater.blog.hu/2011/03/12/hey_mikey_he_likes_it_ready_for_more_3
-    // alapján a parancssor argok ottani elegáns feldolgozásából kb. ennyi marad:
-    // "*((*++argv)+1)"...
-
-    // a kiírás szerint ./lzwtree in_file -o out_file alakra kell mennie, ez 4 db arg:
-    if (argc != 5)
-    {
-        // ha nem annyit kapott a program, akkor felhomályosítjuk erről a júzetr:
-        usage ();
-        // és jelezzük az operációs rendszer felé, hogy valami gáz volt...
-        return -1;
-    }
-
-    // "Megjegyezzük" a bemenő fájl nevét
     char *inFile = *++argv;
+    //HIBAKEZELÉS ***************
+    //HIBAKEZELÉS ***************
+    //HIBAKEZELÉS ***************
 
-    // a -o kapcsoló jön?
-    if (*((*++argv) + 1) != 'o')
-    {
-        usage ();
-        return -2;
-    }
-
-    // ha igen, akkor az 5. előadásból kimásoljuk a fájlkezelés C++ változatát:
+    // megnezzuk megvan-e a 5, ha nincs akkor error uzenetben figyelmeztetjuk a usert. -r
+    err_arg_num(argc);
+	// -o megvan-e ?
+	try {
+    	if (*((*++argv) + 1) != 'o')
+		    {
+		        throw 'o';
+		    }
+	}
+	catch(char o)
+	{
+		err_msg();
+		std::cout<<"Error : 3. argument should be '-o'"<<std::endl;
+		return -2;
+	}
+    //beolvasandó file
     std::fstream beFile (inFile, std::ios_base::in);
-
-    // fejlesztgetjük a forrást: http://progpater.blog.hu/2011/04/17/a_tizedik_tizenegyedik_labor
-    if (!beFile)
-    {
-        std::cout << inFile << " nem letezik..." << std::endl;
-        usage ();
-        return -3;
-    }
+    //létezik-e a megadott bemeneti file?
+    try {
+	    if (!beFile)
+	    {
+	        throw &inFile; //ha nem akkor a bemeneti file nevének memoriacímét átadjuk a catch-nek. -r
+	    }
+	}
+	catch(char** inFile)
+	{
+		err_msg();
+		std::cout<<"Error : '"<<*inFile<<"' doesn't exist."<<std::endl; //'bemeneti_file'-nem létezik, error uzenet.
+		return -3;
+	}
+	
+	//HIBAKEZELÉS ***************
+    //HIBAKEZELÉS ***************
+    //HIBAKEZELÉS ***************
 
     std::fstream kiFile (*++argv, std::ios_base::out);
 
     unsigned char b;		// ide olvassik majd a bejövő fájl bájtjait
     LZWBinFa binFa;		// s nyomjuk majd be az LZW fa objektumunkba
 
-    // a bemenetet binárisan olvassuk, de a kimenő fájlt már karakteresen írjuk, hogy meg tudjuk
-    // majd nézni... :) l. az említett 5. ea. C -> C++ gyökkettes átírási példáit
-
-    while (beFile.read ((char *) &b, sizeof (unsigned char))) // 
-        if (b == 0x0a)                                        //
-            break;
+    // --- IDE PRO TIP : ha ezt a kövi 3 sort nem kommenteljük ki 
+    //,akkor a bemeneti fájlunk ne egy soros legyen, hanem minimum 2.
+    while (beFile.read ((char *) &b, sizeof (unsigned char))) 
+       if (b == 0x0a)										
+           break;											
 
     bool kommentben = false;
 
+
+    /* Itt van egy "b" karakterünk, amibe belekarjuk a vizsgált karaktert és a b-t vizsgáljuk.
+    */
     while (beFile.read ((char *) &b, sizeof (unsigned char)))
     {
-
-        // if (b == 0x00)
-        // {
-        //     nulla++;
-        // }
-
-        // if (b == 0x31)
-        // {
-        //     egy++;
-        // }
 
         if (b == 0x3e)
         {			// > karakter
@@ -568,58 +563,106 @@ main (int argc, char *argv[])
         if (b == 0x4e)		// N betű
             continue;
 
-        // egyszerűen a korábbi d.c kódját bemásoljuk
-        // laboron többször lerajzoltuk ezt a bit-tologatást:
-        // a b-ben lévő bájt bitjeit egyenként megnézzük
+        /*  --- Kérdés : Mit csinál ez a ciklus és benne a b <<= 1 ?
+        	--- Válasz : Végig megy a vizsgált "b" karakter bitjein (8-biten)
+        	és megnézi, hogy 1 vagy 0 és küldi őket a fába a << operátorral() ami fent 135. sor-ban van,
+        	, hogy mit csinál). A b <<= 1; az annyit jelent, hogy egyesével lépeget a bitjein a bitshift
+        	operátorral.
+		*/
         for (int i = 0; i < 8; ++i)
         {
             // maszkolunk eddig..., most már simán írjuk az if fejébe a legmagasabb helyiértékű bit vizsgálatát
             // csupa 0 lesz benne a végén pedig a vizsgált 0 vagy 1, az if megmondja melyik:
-            if (b & 0x80){
+            if (b & 0x80)
                 // ha a vizsgált bit 1, akkor az '1' betűt nyomjuk az LZW fa objektumunkba
                 binFa << '1';
-            }
             else
-            {
                 // különben meg a '0' betűt:
                 binFa << '0';
-            }
             b <<= 1;
         }
 
     }
-    std::string a = argv[1]; /*
-    *argv[] - két dimenziós karakter tömb, a terminálból program indításakor bekért argumentumokat tárolja.
-    (elso dimenzio pl: argv[0] az adott argumentum egészét jelenti, de az argv[0][0] pl. a 0. bemeneti paraméter legelso karaktere).
-    Mivel léptettük az argv-t(*++argv) : 1. char *inFile = *++argv; 2.  std::fstream kiFile (*++argv, std::ios_base::out);
-    ezért az argv[0] lesz jelen pillanatban a terminalbol bekert kiFile pl:(outfile.txt) neve azon belül argv[0][0] az elso karaktere.
-    Nekünk ugye meg kell adnunk egy új kapcsolót, hogy melyik fabejárással akarjuk a fánkat bejárni, 
-    tehát a következő parancssori argumentumot kell megvizsgálnunk, tehát az argv[1]-et. Ezt egy stringbe tároljuk "string a" jelen esetben,
-    mivel C++ nem engedi közvetlenül, hogy *argv[] akármennyit egy stringgel hasonlítsunk össze, tehát nem tudnánk rá pl: 'if == "-inorder"'-t
-    írni.(ne felejtsük el itt a #include <string>-et).
-    */
+    
+   	
+   	std::string a = argv[1];
 
-    if (a == "-i")
-    {
-        binFa.kiiri(kiFile);
-    }
-    else if (a == "-po")
-    {
-        binFa.kiirpo(kiFile);
-    }
-    else if (a == "-pr")
-    {
-        binFa.kiirpr(kiFile);
-    }
-    //std::cout << binFa.kiir (); // így rajzolt ki a fát a korábbi verziókban de, hogy izgalmasabb legyen
-    // a példa, azaz ki lehessen tolni az LZWBinFa-t kimeneti csatornára:
-    // ehhez kell a globális operator<< túlterhelése, lásd fentebb
-    // (jó ez az OO, mert mi ugye nem igazán erre gondoltunk, amikor írtuk, mégis megy, hurrá)
-    kiFile << "depth = " << binFa.getMelyseg () << std::endl;
+   	/* --- Kérdés : Miért argv[1] lesz a "-i | -po | -pr"?
+   	   --- Válasz : Mert már fentebb léptettük az argv-t és ezáltal az argv[0] lesz a kimeneti fájl, tehát argv[1] a "-i | -po | -pr".
+   	*/
+
+    /* --- Magyarázat
+    *argv[] - két dimenziós karakter tömb(ugy kell elkepzelni, hogy egy olyan tömb ami karakter tömböket("stringeket") tárol), a terminálból program indításakor bekért argumentumokat tárolja.
+    (elso dimenzio pl: argv[0] az adott argumentum egészét jelenti (magát a "stringet"), de pl. : az argv[0][0] a 0. bemeneti paraméter legelso karaktere).
+    Mivel léptettük az argv-t így : "*++argv" kétszer is : 1. char *inFile = *++argv; 2.  std::fstream kiFile (*++argv, std::ios_base::out);
+    ezért az argv[0] lesz jelen pillanatban a terminalbol bekert kimeneti fájl pl:(outfile.txt) neve azon belül argv[0][0] az elso karaktere.
+    Nekünk ugye meg kell adnunk egy új kapcsolót, hogy melyik fabejárással akarjuk a fánkat bejárni, 
+    ehez a következő parancssori argumentumot kell megvizsgálnunk, tehát az argv[1]-et. Ezt egy stringbe tároljuk (pont efelett) "string a" jelen esetben,
+    mivel a C++ nem engedi közvetlenül, hogy *argv[] akármelyik elemét egy stringgel hasonlítsunk össze, tehát nem tudnánk rá pl: 'if == "-inorder"'-t
+    írni.(ne felejtsük el itt a #include <string>-et). Ha ez érthetetlen akkor itt van példában, h mi ez az argv : 
+
+
+		(
+		 Példa : argv[0] = kimeneti_fajl_neve.txt
+    	 argv[0][0] = k
+    	 argv[0][1] = i
+    	 argv[0][2] = m
+    	 argv[0][3] = e
+    	 argv[0][4] = n
+    	 argv[0][5] = e
+    	 argv[0][6] = t
+    	 argv[0][7] = i
+    	 ....
+		 
+		 Például :
+    	 argv[1] = "-po" 
+    	 argv[1][0] = -
+    	 argv[1][1] = p
+    	 argv[1][2] = o
+
+    	 )
+    
+    */
+ 	
+   	/* --- Paraszt módszer, de működik. 3 feltételt írunk a 3 fajta bejárásra,
+   	 Attől függően, hogy mit ír be a user, ugy járjuk be a fát.
+   	*/
+
+   	if (a == "-i")
+   	{
+   		kiFile << "INORDER" << std::endl;
+   		binFa.kiiri(kiFile);
+   	}
+   	else if (a == "-po")
+   	{
+   		kiFile << "POSTORDER" <<std::endl;
+   		binFa.kiirpo(kiFile);
+   	}
+   	else if (a == "-pr")
+   	{
+   		kiFile << "PREORDER" <<std::endl;
+   		binFa.kiirpr(kiFile);
+   	}
+
+   	// Megnézzük van-e -s kapcsoló a végén, ha igen akkor írjuk a statisztikát 0-ra meg 1-ekre valóan.
+   	if (argc == 6)
+   	{
+   	std::string s = argv[2];
+
+   		if (s == "-s")
+   		{
+   			kiFile <<"--- Nullák statisztikái ---"<<"\nVizsgált 0-k száma : " << binFa.getOsszNull() << "\nA fába bekerült 0-k száma : " <<binFa.getNull() << std::endl;
+   			kiFile <<"A vizsgált nullák "<< stat(binFa.getNull(),binFa.getOsszNull()) << "%-a került be a fába"<< std::endl;
+
+   			kiFile <<"--- Egyek statisztikái ---"<<"\nVizsgált 1-k száma : " << binFa.getOsszEgy() << "\nA fába bekerült 1-k száma : " <<binFa.getEgy() << std::endl;
+   			kiFile <<"A vizsgált egyek "<< stat(binFa.getEgy(),binFa.getOsszEgy()) << "%-a került be a fába"<< std::endl;
+    	}
+	}
+
+    kiFile << "depth = " << binFa.getMelyseg () << std::endl;   
     kiFile << "mean = " << binFa.getAtlag () << std::endl;
     kiFile << "var = " << binFa.getSzoras () << std::endl;
-    kiFile << "nullak = "<<binFa.getNulla()<<std::endl;
-    kiFile << "egyek = "<<binFa.getEgy()<<std::endl;
+
     kiFile.close ();
     beFile.close ();
 
